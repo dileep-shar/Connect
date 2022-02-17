@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">CONNECT</string>
+    <string name="post">POST</string>
+    <string name="name_here">Name here</string>
+    <string name="posted_time">Posted Time</string>
+    <string name="_0">0</string>
+</resources>
