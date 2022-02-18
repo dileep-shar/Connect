@@ -1,10 +1,12 @@
 package com.example.connect;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -61,5 +63,16 @@ public class HomeActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         postAdapter.stopListening();
+    }
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setContentView(R.layout.activity_home);
+
+        } else {
+            setContentView(R.layout.activity_home);
+        }
     }
 }

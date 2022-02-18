@@ -16,7 +16,6 @@ import com.example.connect.models.Post;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 public class PostAdapter extends FirestoreRecyclerAdapter<Post, PostAdapter.PostViewHolder> {
 
@@ -27,8 +26,11 @@ public class PostAdapter extends FirestoreRecyclerAdapter<Post, PostAdapter.Post
      * @param options
      */
 
+    ViewGroup parent;
+    String postId;
     CustomItemClickListener listener;
     timePassed t = new timePassed();
+
     public PostAdapter(@NonNull FirestoreRecyclerOptions options, CustomItemClickListener listener) {
         super(options);
         this.listener = listener;
@@ -38,46 +40,92 @@ public class PostAdapter extends FirestoreRecyclerAdapter<Post, PostAdapter.Post
     @NonNull
     @Override
     public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_post, parent, false);
-        PostViewHolder p = new PostViewHolder(view);
-        view.setOnClickListener(view1 -> listener.onItemClick(view1,getSnapshots().getSnapshot(p.getAbsoluteAdapterPosition()).getId()));
-        return p;
 
+        if(viewType==0){
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.my_single_post,parent,false);
+            PostViewHolder p = new PostViewHolder(view,viewType);
+            view.setOnClickListener(view1 -> listener.onItemClick(view1, getSnapshots().getSnapshot(p.getAbsoluteAdapterPosition()).getId()));
+
+            return p;
+        }else {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_post, parent, false);
+            PostViewHolder p = new PostViewHolder(view, viewType);
+
+            view.setOnClickListener(view1 -> listener.onItemClick(view1, getSnapshots().getSnapshot(p.getAbsoluteAdapterPosition()).getId()));
+            return p;
+        }
 
     }
 
+
     @Override
     protected void onBindViewHolder(@NonNull PostViewHolder holder, int position, @NonNull Post model) {
-        holder.name.setText(model.getCreatedBy().getUserName());
-        holder.content.setText(model.getContent());
+
 
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         String currentUserId = firebaseAuth.getUid();
-        holder.countLikes.setText(String.format("%d",model.getLikedBy().size()));
+
+        holder.name.setText(model.getCreatedBy().getUserName());
+        holder.content.setText(model.getContent());
+        holder.countLikes.setText(String.format("%d", model.getLikedBy().size()));
 
         holder.created.setText(t.getTimePassed(model.getCreatedAt()));
         Glide.with(holder.profile_picture.getContext()).load(model.getCreatedBy().getImageUrl()).circleCrop().into(holder.profile_picture);
-        if(model.getLikedBy().contains(currentUserId)){
-            holder.likebutton.setImageDrawable(ContextCompat.getDrawable(holder.likebutton.getContext(),R.drawable.like_image_liked));
-        }else{
-            holder.likebutton.setImageDrawable(ContextCompat.getDrawable(holder.likebutton.getContext(),R.drawable.like_image_not_liked));
+        if (model.getLikedBy().contains(currentUserId)) {
+            holder.likebutton.setImageDrawable(ContextCompat.getDrawable(holder.likebutton.getContext(), R.drawable.liked_heart_image_liked));
+        } else {
+            holder.likebutton.setImageDrawable(ContextCompat.getDrawable(holder.likebutton.getContext(), R.drawable.liked_heart_image_not));
         }
     }
 
     class PostViewHolder extends RecyclerView.ViewHolder {
         TextView name, content, countLikes, created;
-        ImageView profile_picture,likebutton;
+        ImageView profile_picture, likebutton;
 
-        public PostViewHolder(@NonNull View itemView) {
+        public PostViewHolder(@NonNull View itemView,int num) {
             super(itemView);
-            name = itemView.findViewById(R.id.userName);
-            content = itemView.findViewById(R.id.content_display);
-            profile_picture = itemView.findViewById(R.id.profile_picture);
-            created = itemView.findViewById(R.id.posted_time);
-            countLikes = itemView.findViewById(R.id.count_likes);
-          likebutton = itemView.findViewById(R.id.likeButton);
+            if(num==1) {
+                name = itemView.findViewById(R.id.userName);
+                content = itemView.findViewById(R.id.content_display);
+                profile_picture = itemView.findViewById(R.id.profile_picture);
+                created = itemView.findViewById(R.id.posted_time);
+                countLikes = itemView.findViewById(R.id.count_likes);
+                likebutton = itemView.findViewById(R.id.likeButton);
+            }else{
+                name = itemView.findViewById(R.id.userName_mine);
+                content = itemView.findViewById(R.id.content_display_mine);
+                profile_picture = itemView.findViewById(R.id.profile_picture_mine);
+                created = itemView.findViewById(R.id.posted_time_mine);
+                countLikes = itemView.findViewById(R.id.count_likes_mine);
+                likebutton = itemView.findViewById(R.id.likeButton_mine);
+            }
         }
     }
+
+    @Override
+    public int getItemViewType(int pos) {
+
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        String currentUserId = firebaseAuth.getUid();
+        if (getSnapshots().get(pos).getCreatedBy().getUserId().equals(currentUserId))
+            return 0;
+        else return 1;
+    }
+
+//    public class PostViewHolderMine extends RecyclerView.ViewHolder {
+//        TextView name, content, countLikes, created;
+//        ImageView profile_picture, likebutton;
+//
+//        public PostViewHolderMine(@NonNull View itemView) {
+//            super(itemView);
+//            name = itemView.findViewById(R.id.userName);
+//            content = itemView.findViewById(R.id.content_display);
+//            profile_picture = itemView.findViewById(R.id.profile_picture);
+//            created = itemView.findViewById(R.id.posted_time);
+//            countLikes = itemView.findViewById(R.id.count_likes);
+//            likebutton = itemView.findViewById(R.id.likeButton);
+//        }
+//    }
 
     public interface CustomItemClickListener {
         public void onItemClick(View v, String a);

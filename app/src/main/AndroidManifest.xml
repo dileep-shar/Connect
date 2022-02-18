@@ -11,9 +11,13 @@
         android:theme="@style/Theme.CONNECT">
         <activity
             android:name=".CreatePostActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:parentActivityName=".HomeActivity"/>
         <activity
             android:name=".HomeActivity"
+
             android:exported="false" />
         <activity
             android:name=".MainActivity"
