@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import com.example.connect.daos.PostDao;
@@ -47,7 +46,7 @@ public class HomeActivity extends AppCompatActivity {
         Query query = postCollection.orderBy("createdAt", Query.Direction.DESCENDING);
 
         FirestoreRecyclerOptions<Post> posts = new FirestoreRecyclerOptions.Builder<Post>().setQuery(query, Post.class).build();
-        postAdapter = new PostAdapter(posts, (v, position) -> postDao.updateLikes(position,getApplicationContext()));
+        postAdapter = new PostAdapter(posts, (v, position) -> postDao.updateLikes(position, getApplicationContext()));
         recyclerView.setAdapter(postAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -64,15 +63,16 @@ public class HomeActivity extends AppCompatActivity {
         super.onStop();
         postAdapter.stopListening();
     }
+
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            setContentView(R.layout.activity_home);
-
+            setContentView(R.layout.activity_landscape_home);
         } else {
             setContentView(R.layout.activity_home);
+
         }
     }
 }
